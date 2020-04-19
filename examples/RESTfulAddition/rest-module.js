@@ -1,16 +1,16 @@
-const baseModuleType = require("./mac-module");
+const moduleType = require("../../dist/index").MACModule
 const rawActor = require("../actors/mac-actor");
 const express = require("express")
 const shortid = require('shortid');
 
-module.exports = class RestModule extends baseModuleType {
-
-    static ModuleName() {
-        return "Rest";
-    }
+module.exports = class RestModule extends moduleType {
 
     constructor(channelManager, listeningPort) {
-        super(RestModule.ModuleName(), channelManager);
+        this.name = this.name.bind(this);
+        this.templateSelector = this.templateSelector.bind(this);
+
+        super(channelManager, undefined, undefined, templateSelector);
+
         this.results = new Map();
         this._app = express();
         this._app.use(express.json()) // for parsing application/json
@@ -34,4 +34,22 @@ module.exports = class RestModule extends baseModuleType {
         this._app.listen(listeningPort, () => console.log(`Rest module listening at http://localhost:${listeningPort}`))
     }
 
+    name() {
+        return "Rest";
+    }
+
+    templateSelector(templateId) {
+        return [
+            function i1(module) { return "Add"; },
+            function i2(module) {
+                this.properties.set("Result", module.add(this.properties.get("LHSOperand"), this.properties.get("RHSOperand")));
+                return true;
+            },
+            function i3(module) { return "Rest"; },
+            function i4(module) {
+                module.results.set(this.id, this.properties.get("Result"));
+                return false;
+            }
+        ]
+    }
 }
