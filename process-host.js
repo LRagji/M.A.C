@@ -4,16 +4,20 @@ const actorFactoryModuleType = require("./modules/actor-factory-module");
 const restModuleType = require("./modules/rest-module");
 const channelInstance = new channelManagerType();
 const addModuleInstance = new addModuleType(channelInstance);
-const actoryFactoryModuleInstance = new actorFactoryModuleType(channelInstance);
+const actoryFactoryModuleInstance = new actorFactoryModuleType(channelInstance, (templateId) => {
+    return [
+        function i1(module) { return "Add"; },
+        function i2(module) {
+            this.result = module.add(this.LHSOperand, this.RHSOperand);
+            return true;
+        },
+        function i3(module) { return "Rest"; },
+        function i4(module) {
+            module.results.set(this.id, this.result);
+            return false;
+        }
+    ]
+});
 const restModuleInstance = new restModuleType(channelInstance, 3000);
-
-// const doubleOperandActorType = require("./actors/double-operand-actor");
-
-// const addModuleHost = new hostModuleType(addModuleType.ModuleName(), channelInstance, new addModuleType());
-// const doubleOperator = new doubleOperandActorType(1);
-// doubleOperator.LHSOperand = 5;
-// doubleOperator.RHSOperand = 5;
-
-//channelInstance.teleport()
 
 
