@@ -7,11 +7,11 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch MAC",
+            "name": "Launch Sum Example",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/process-host.js"
+            "program": "${workspaceFolder}/examples/RESTfulAddition/process-host.js"
         }
     ]
 }

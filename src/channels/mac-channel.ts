@@ -1,4 +1,5 @@
 import { MACActor } from "../actors/mac-actor";
+import { MACModule } from "..";
 
 export abstract class MACChannel {
 
@@ -6,32 +7,54 @@ export abstract class MACChannel {
         this.registerModule = this.registerModule.bind(this);
         this.serialize = this.serialize.bind(this);
         this.deserialize = this.deserialize.bind(this);
-        this.serializeFunction = this.serializeFunction.bind(this);
-        this.deserializeFunction = this.deserializeFunction.bind(this);
+        this.serializeInstructions = this.serializeInstructions.bind(this);
+        this.deserializeInstructions = this.deserializeInstructions.bind(this);
+        this.serializeProperties = this.serializeProperties.bind(this);
+        this.deserializeProperties = this.deserializeProperties.bind(this);
     }
 
     abstract registerModule(channelName: string, onActorReceivedHandler: (actor: MACActor) => boolean)
-   
+
     abstract teleport(channelName: string, actor: MACActor): boolean
 
     serialize(actor: MACActor): string {
-        actor.instructions = actor.instructions.map(instruction => this.serializeFunction(instruction));
-        return JSON.stringify(actor);
+        const proxyActor = new SerializedActor();
+        proxyActor.instructions = actor.instructions.map(instruction => this.serializeInstructions(instruction));
+        proxyActor.properties = this.serializeProperties(actor.properties);
+        proxyActor.id = actor.id;
+        proxyActor.exception = actor.exception!==undefined?actor.exception.message:undefined;
+        return JSON.stringify(proxyActor);
     }
 
     deserialize(serializedActor: string): MACActor {
-        const actor:MACActor = JSON.parse(serializedActor);
-        let instructions = actor.instructions.map(instruction => this.deserializeFunction(instruction));
-        const completeActor = Object.assign(new MACActor(actor.id,instructions), actor);
-        return completeActor;
+        const proxyActor: SerializedActor = JSON.parse(serializedActor);
+        let instructions = proxyActor.instructions.map(instruction => this.deserializeInstructions(instruction));
+        let properties = this.deserializeProperties(proxyActor.properties);
+        let error: Error = proxyActor.exception !== undefined ? new Error(proxyActor.exception) : undefined;
 
+        return new MACActor(proxyActor.id, instructions, properties, error);
     }
 
-    private serializeFunction(fn) {
-        return fn.toString();
+    private serializeInstructions(instruction: (((module: MACModule) => string) | ((module: MACModule) => boolean))): string {
+        return instruction.toString();
     }
 
-    private deserializeFunction(serial) {
-        return new Function(`"use strict"; return ${serial};`)()
+    private deserializeInstructions(serializedFunction: string): (((module: MACModule) => string) | ((module: MACModule) => boolean)) {
+        return new Function(`"use strict"; return ${serializedFunction};`)()
     }
+
+    private serializeProperties(props: Map<string, any>): string {
+        return JSON.stringify([...props.entries()]);
+    }
+
+    private deserializeProperties(serializedProps: string): Map<string, any> {
+        return JSON.parse(serializedProps).reduce((m, [key, val]) => m.set(key, val), new Map());
+    }
+}
+
+class SerializedActor {
+    id: string;
+    instructions: string[];
+    properties: string;
+    exception: string;
 }

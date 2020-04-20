@@ -3,25 +3,24 @@ import { MACActor } from "../actors/mac-actor";
 
 export abstract class MACModule {
     #channel: MACChannel;
-    #templateResolver: (templateId: number) => (((module: MACModule) => string) | ((module: MACModule) => boolean))[];
     #errorChannelName: string;
     #recycleChannelName: string;
 
     abstract name(): string;
+    abstract templateResolver(templateId: number): (((module: MACModule) => string) | ((module: MACModule) => boolean))[];
 
-    constructor(channel: MACChannel, errorChannelName: string = "Error", recycleChannelName = "Recycle", templateResolver: (templateId: number) => (((module: MACModule) => string) | ((module: MACModule) => boolean))[] = (templateId) => [(module) => false]) {
+    constructor(channel: MACChannel, errorChannelName: string = "Error", completedChannelName = "Completed") {
         this.handleActorReceived = this.handleActorReceived.bind(this);
         this.name = this.name.bind(this);
-        this.fetchActor = this.fetchActor.bind(this);
+        this.processNewActor = this.processNewActor.bind(this);
 
         this.#channel = channel;
         this.#channel.registerModule(this.name(), this.handleActorReceived);
-        this.#templateResolver = templateResolver;
         this.#errorChannelName = errorChannelName;
-        this.#recycleChannelName = recycleChannelName;
+        this.#recycleChannelName = completedChannelName;
     }
 
-    handleActorReceived(actor: MACActor) {
+    handleActorReceived(actor: MACActor):boolean {
         let keepGoing: string | boolean = false;
         try {
             do {
@@ -45,8 +44,9 @@ export abstract class MACModule {
         return true;
     }
 
-    fetchActor(templateId: number, actorId: string, properties: Map<string, any>): MACActor {
-        return new MACActor(actorId, this.#templateResolver(templateId), properties);
+    processNewActor(templateId: number, actorId: string, properties: Map<string, any>): boolean {
+        let newActor: MACActor = new MACActor(actorId, this.templateResolver(templateId), properties);
+        return this.handleActorReceived(newActor);
     }
 
 }

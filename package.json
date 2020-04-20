@@ -1,19 +1,40 @@
 {
-  "name": "mac",
+  "name": "m.a.c",
   "version": "0.0.1",
-  "description": "",
-  "main": "process-host.js",
+  "description": "This is a bootstrap module for M.A.C Architecture, It contains abstract implementations for the common patterns encountered.",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example1": "npm run build && node examples/RESTfulAddition/process-host.js"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.1",
-    "shortid": "^2.2.15"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LRagji/M.A.C.git"
   },
+  "keywords": [
+    "Modules",
+    "Actors",
+    "Channels",
+    "M.A.C",
+    "MAC",
+    "System Architecture",
+    "laukik"
+  ],
+  "files": [
+    "dist"
+  ],
+  "author": "Laukik",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/LRagji/M.A.C/issues"
+  },
+  "homepage": "https://github.com/LRagji/M.A.C#readme",
+  "dependencies": {},
   "devDependencies": {
     "@types/node": "^13.13.0",
+    "express": "^4.17.1",
+    "shortid": "^2.2.15",
     "tsc": "^1.20150623.0",
     "typescript": "^3.8.3"
   }

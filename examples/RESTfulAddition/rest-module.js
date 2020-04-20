@@ -1,15 +1,14 @@
 const moduleType = require("../../dist/index").MACModule
-const rawActor = require("../actors/mac-actor");
 const express = require("express")
 const shortid = require('shortid');
 
 module.exports = class RestModule extends moduleType {
 
     constructor(channelManager, listeningPort) {
-        this.name = this.name.bind(this);
-        this.templateSelector = this.templateSelector.bind(this);
+        super(channelManager);
 
-        super(channelManager, undefined, undefined, templateSelector);
+        this.name = this.name.bind(this);
+        this.templateResolver = this.templateResolver.bind(this);
 
         this.results = new Map();
         this._app = express();
@@ -22,13 +21,18 @@ module.exports = class RestModule extends moduleType {
         });
 
         this._app.post('/add', (req, res) => {
-            let tempActor = new rawActor(shortid.generate());
-            tempActor.templateId = 1;
-            tempActor.LHSOperand = req.body.LHSOperand;
-            tempActor.RHSOperand = req.body.RHSOperand;
-            this.handleActorReceived(tempActor);
-            res.location("http://localhost:3000/results/" + tempActor.id);
-            res.sendStatus(201);
+            let properties = new Map();
+            properties.set("LHSOperand", req.body.LHSOperand);
+            properties.set("RHSOperand", req.body.RHSOperand);
+            const id = shortid.generate();
+            const result = this.processNewActor(0, id, properties);
+            if (result === true) {
+                res.location("http://localhost:3000/results/" + id);
+                res.sendStatus(201);
+            }
+            else {
+                res.sendStatus(500);
+            }
         });
 
         this._app.listen(listeningPort, () => console.log(`Rest module listening at http://localhost:${listeningPort}`))
@@ -38,7 +42,7 @@ module.exports = class RestModule extends moduleType {
         return "Rest";
     }
 
-    templateSelector(templateId) {
+    templateResolver(templateId) {
         return [
             function i1(module) { return "Add"; },
             function i2(module) {
