@@ -1,7 +1,7 @@
 {
-  "name": "m.a.c",
+  "name": "mac-design-pattern",
   "version": "0.0.1",
-  "description": "This is a bootstrap module for M.A.C Architecture, It contains abstract implementations for the common patterns encountered.",
+  "description": "This is a bootstrap module for M.A.C Architecture, It contains abstract classes to implement a super flexible application design.",
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
