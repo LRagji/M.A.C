@@ -7,7 +7,7 @@ export abstract class MACModule {
     #recycleChannelName: string;
 
     abstract name(): string;
-    abstract templateResolver(templateId: number): (((module: MACModule) => string) | ((module: MACModule) => boolean))[];
+    abstract async templateResolver(templateId: number): Promise<((module: MACModule) => Promise<string | boolean>)[]>;
 
     constructor(channel: MACChannel, errorChannelName: string = "Error", completedChannelName = "Completed") {
         this.handleActorReceived = this.handleActorReceived.bind(this);
@@ -20,33 +20,33 @@ export abstract class MACModule {
         this.#recycleChannelName = completedChannelName;
     }
 
-    handleActorReceived(actor: MACActor):boolean {
+    async handleActorReceived(actor: MACActor): Promise<boolean> {
         let keepGoing: string | boolean = false;
         try {
             do {
-                keepGoing = actor.executeNextInstruction(this);//This line here is the inception!!, cant think of anything better
+                keepGoing = await actor.executeNextInstruction(this);//This line here is the inception!!, cant think of anything better
             }
             while (keepGoing === true)
 
             if (keepGoing !== false) {
-                this.#channel.teleport(keepGoing, actor);
+                await this.#channel.teleport(keepGoing, actor);
             }
 
             if (keepGoing === false) {
-                this.#channel.teleport(this.#recycleChannelName, actor);
+                await this.#channel.teleport(this.#recycleChannelName, actor);
             }
         }
         catch (err) {
             actor.exception = err;
-            this.#channel.teleport(this.#errorChannelName, actor);
+            await this.#channel.teleport(this.#errorChannelName, actor);
         }
 
         return true;
     }
 
-    processNewActor(templateId: number, actorId: string, properties: Map<string, any>): boolean {
-        let newActor: MACActor = new MACActor(actorId, this.templateResolver(templateId), properties);
-        return this.handleActorReceived(newActor);
+    async processNewActor(templateId: number, actorId: string, properties: Map<string, any>): Promise<boolean> {
+        let newActor: MACActor = new MACActor(actorId, await this.templateResolver(templateId), properties);
+        return await this.handleActorReceived(newActor);
     }
 
 }

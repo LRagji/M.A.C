@@ -6,7 +6,7 @@ export class ConsoleCompletedModule extends MACModule {
         return "Completed";
     }
 
-    templateResolver(templateId: number): (((module: MACModule) => string) | ((module: MACModule) => boolean))[] {
+    async templateResolver(templateId: number): Promise<((module: MACModule) => Promise<string | boolean>)[]> {
         throw new Error("Method not implemented.");
     }
 
@@ -14,7 +14,7 @@ export class ConsoleCompletedModule extends MACModule {
         super(channelManager);
     }
 
-    handleActorReceived(actor: MACActor): boolean {
+    async handleActorReceived(actor: MACActor): Promise<boolean> {
         console.log("Completed:" + actor.id + ", " + actor);
         return true;
     }

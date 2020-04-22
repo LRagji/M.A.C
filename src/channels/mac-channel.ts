@@ -1,5 +1,5 @@
 import { MACActor } from "../actors/mac-actor";
-import { MACModule } from "..";
+import { MACModule } from "../modules/mac-module";
 
 export abstract class MACChannel {
 
@@ -13,20 +13,20 @@ export abstract class MACChannel {
         this.deserializeProperties = this.deserializeProperties.bind(this);
     }
 
-    abstract registerModule(channelName: string, onActorReceivedHandler: (actor: MACActor) => boolean)
+    abstract registerModule(channelName: string, onActorReceivedHandler: (actor: MACActor) => Promise<boolean>)
 
-    abstract teleport(channelName: string, actor: MACActor): boolean
+    abstract async teleport(channelName: string, actor: MACActor): Promise<boolean>
 
-    serialize(actor: MACActor): string {
+    private serialize(actor: MACActor): string {
         const proxyActor = new SerializedActor();
         proxyActor.instructions = actor.instructions.map(instruction => this.serializeInstructions(instruction));
         proxyActor.properties = this.serializeProperties(actor.properties);
         proxyActor.id = actor.id;
-        proxyActor.exception = actor.exception!==undefined?actor.exception.message:undefined;
+        proxyActor.exception = actor.exception !== undefined ? actor.exception.message : undefined;
         return JSON.stringify(proxyActor);
     }
 
-    deserialize(serializedActor: string): MACActor {
+    private deserialize(serializedActor: string): MACActor {
         const proxyActor: SerializedActor = JSON.parse(serializedActor);
         let instructions = proxyActor.instructions.map(instruction => this.deserializeInstructions(instruction));
         let properties = this.deserializeProperties(proxyActor.properties);
@@ -35,11 +35,11 @@ export abstract class MACChannel {
         return new MACActor(proxyActor.id, instructions, properties, error);
     }
 
-    private serializeInstructions(instruction: (((module: MACModule) => string) | ((module: MACModule) => boolean))): string {
+    private serializeInstructions(instruction:((module: MACModule) => Promise<string | boolean>)): string {
         return instruction.toString();
     }
 
-    private deserializeInstructions(serializedFunction: string): (((module: MACModule) => string) | ((module: MACModule) => boolean)) {
+    private deserializeInstructions(serializedFunction: string): ((module: MACModule) => Promise<string | boolean>) {
         return new Function(`"use strict"; return ${serializedFunction};`)()
     }
 
