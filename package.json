@@ -5,8 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "example1": "npm run build && node examples/RESTfulAddition/process-host.js"
+    "test": "npx mocha",
+    "example1": "npm run build && node examples/RESTfulAddition/process-host.js",
+    "redis": "docker run -p 6379:6379 -it --rm redis:latest"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,8 @@
   "devDependencies": {
     "@types/node": "^13.13.0",
     "express": "^4.17.1",
+    "mocha": "^7.1.1",
+    "redis-streams-broker": "0.0.1",
     "shortid": "^2.2.15",
     "tsc": "^1.20150623.0",
     "typescript": "^3.8.3"

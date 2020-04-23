@@ -20,12 +20,12 @@ module.exports = class RestModule extends moduleType {
             res.send(response);
         });
 
-        this._app.post('/add', (req, res) => {
+        this._app.post('/add', async (req, res) => {
             let properties = new Map();
             properties.set("LHSOperand", req.body.LHSOperand);
             properties.set("RHSOperand", req.body.RHSOperand);
             const id = shortid.generate();
-            const result = this.processNewActor(0, id, properties);
+            const result = await this.processNewActor(0, id, properties);
             if (result === true) {
                 res.location("http://localhost:3000/results/" + id);
                 res.sendStatus(201);
@@ -42,15 +42,16 @@ module.exports = class RestModule extends moduleType {
         return "Rest";
     }
 
-    templateResolver(templateId) {
+    async templateResolver(templateId) {
         return [
-            function i1(module) { return "Add"; },
-            function i2(module) {
-                this.properties.set("Result", module.add(this.properties.get("LHSOperand"), this.properties.get("RHSOperand")));
+            async function i1(module) { return "Add"; },
+            async function i2(module) {
+                const result = await module.add(this.properties.get("LHSOperand"), this.properties.get("RHSOperand"));
+                this.properties.set("Result", result);
                 return true;
             },
-            function i3(module) { return "Rest"; },
-            function i4(module) {
+            async function i3(module) { return "Rest"; },
+            async function i4(module) {
                 module.results.set(this.id, this.properties.get("Result"));
                 return false;
             }

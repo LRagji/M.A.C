@@ -4,7 +4,7 @@ module.exports = class AddModule extends moduleType {
 
     constructor(channelManager) {
         super(channelManager);
-        
+
         this.name = this.name.bind(this);
         this.add = this.add.bind(this);
     }
@@ -13,7 +13,9 @@ module.exports = class AddModule extends moduleType {
         return "Add";
     }
 
-    add(LHSOperand, RHSOperand) {
-        return LHSOperand + RHSOperand;
+    async add(LHSOperand, RHSOperand) {
+        return new Promise((acc, rej) => {
+            setTimeout(() => acc(LHSOperand + RHSOperand), 20000);
+        });
     }
 }
