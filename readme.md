@@ -36,8 +36,36 @@ Completed code implementation here [Example 2](examples/RESTfulAddition)
 
 I realised I need a more bass ass real usecase which basically absues release 1 requirements.
 
-## API
+## Type Definition
 
-**MacModule** Functions
-1. ``name()`` : Its a abstract function which needs to be overridden by inheriting class should return string which is name of the module.
-2. ``templateResolver(templateId)`` : Its a abstract function needs to be overriden, should return instructions[] for the given template to create actor.
+**MacModule**
+```javascript
+abstract class MACModule {
+    abstract name(): string;
+    abstract templateResolver(templateId: number): Promise<((module: MACModule) => Promise<string | boolean>)[]>;
+    constructor(channel: MACChannel, errorChannelName?: string, completedChannelName?: string);
+    handleActorReceived(actor: MACActor): Promise<boolean>;
+    processNewActor(templateId: number, actorId: string, properties: Map<string, any>): Promise<boolean>;
+}
+```
+
+**MacChannel**
+```javascript
+abstract class MACChannel {
+    constructor();
+    abstract registerModule(channelName: string, onActorReceivedHandler: (actor: MACActor) => Promise<boolean>): any;
+    abstract teleport(channelName: string, actor: MACActor): Promise<boolean>;
+}
+```
+
+**MacActor**
+```javascript
+class MACActor {
+    id: string;
+    instructions: ((module: MACModule) => Promise<string | boolean>)[];
+    exception: Error;
+    properties: Map<string, any>;
+    constructor(id: string, instructions: ((module: MACModule) => Promise<string | boolean>)[], properties?: Map<string, any>, error?: Error);
+    executeNextInstruction(moduleInstance: MACModule): Promise<string | boolean>;
+}
+```

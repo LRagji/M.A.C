@@ -15,8 +15,8 @@ export class MACActor {
     }
 
     async executeNextInstruction(moduleInstance: MACModule): Promise<string | boolean> {
-        let currentInstruction = this.instructions.shift();
+        let currentInstruction: (module: MACModule) => Promise<string | boolean> = this.instructions.shift();
         currentInstruction = currentInstruction.bind(this);
-        return currentInstruction(moduleInstance);
+        return await currentInstruction(moduleInstance);
     }
 };
