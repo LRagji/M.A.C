@@ -17,7 +17,7 @@ export abstract class MACChannel {
 
     abstract async teleport(channelName: string, actor: MACActor): Promise<boolean>
 
-    private serialize(actor: MACActor): string {
+    serialize(actor: MACActor): string {
         const proxyActor = new SerializedActor();
         proxyActor.instructions = actor.instructions.map(instruction => this.serializeInstructions(instruction));
         proxyActor.properties = this.serializeProperties(actor.properties);
@@ -26,7 +26,7 @@ export abstract class MACChannel {
         return JSON.stringify(proxyActor);
     }
 
-    private deserialize(serializedActor: string): MACActor {
+    deserialize(serializedActor: string): MACActor {
         const proxyActor: SerializedActor = JSON.parse(serializedActor);
         let instructions = proxyActor.instructions.map(instruction => this.deserializeInstructions(instruction));
         let properties = this.deserializeProperties(proxyActor.properties);
