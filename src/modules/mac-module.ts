@@ -7,7 +7,6 @@ export abstract class MACModule {
     #recycleChannelName: string;
 
     abstract name(): string;
-    abstract async templateResolver(templateId: number): Promise<((module: MACModule) => Promise<string | boolean>)[]>;
 
     constructor(channel: MACChannel, errorChannelName: string = "Error", completedChannelName = "Completed") {
         this.handleActorReceived = this.handleActorReceived.bind(this);
@@ -44,9 +43,8 @@ export abstract class MACModule {
         return true;
     }
 
-    async processNewActor(templateId: number, actorId: string, properties: Map<string, any>): Promise<boolean> {
-        let newActor: MACActor = new MACActor(actorId, await this.templateResolver(templateId), properties);
-        return await this.handleActorReceived(newActor);
+    async processNewActor(actor: MACActor): Promise<boolean> {
+        return await this.handleActorReceived(actor);
     }
 
 }

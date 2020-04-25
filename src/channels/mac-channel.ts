@@ -13,7 +13,7 @@ export abstract class MACChannel {
         this.deserializeProperties = this.deserializeProperties.bind(this);
     }
 
-    abstract registerModule(channelName: string, onActorReceivedHandler: (actor: MACActor) => Promise<boolean>)
+    abstract async registerModule(channelName: string, onActorReceivedHandler: (actor: MACActor) => Promise<boolean>): Promise<boolean>
 
     abstract async teleport(channelName: string, actor: MACActor): Promise<boolean>
 
@@ -35,7 +35,7 @@ export abstract class MACChannel {
         return new MACActor(proxyActor.id, instructions, properties, error);
     }
 
-    private serializeInstructions(instruction:((module: MACModule) => Promise<string | boolean>)): string {
+    private serializeInstructions(instruction: ((module: MACModule) => Promise<string | boolean>)): string {
         return instruction.toString();
     }
 

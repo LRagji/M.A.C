@@ -1,6 +1,6 @@
 {
   "name": "mac-design-pattern",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "This is a bootstrap module for M.A.C Architecture, It contains abstract classes to implement a super flexible application design.",
   "main": "dist/index.js",
   "scripts": {
