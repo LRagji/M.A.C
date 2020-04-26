@@ -1,0 +1,20 @@
+{
+  "name": "rest-calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "process-host.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mac-design-pattern": "0.0.6",
+    "mac-keyvalue-module": "0.0.2",
+    "mac-redis-channel": "0.0.1",
+    "mac-rest-module": "0.0.1",
+    "shortid": "^2.2.15"
+  }
+}

@@ -20,7 +20,7 @@ So we build a restful API for different Math Operations and expose them. solutio
 | Instructions  | Actor  | Responsible to interpret the commands and use them to achive the result via Math Engine.   |
 | Que | Channel | Responsible for passing data between the modules. |
 
-Completed code implementation here [Example 1](examples/RESTfulAddition)
+Completed code implementation here [Example 1](examples/RESTCalculator)
 
 **Release 2** : The customer is impressed by our calculator offering as its the most acurate and reliable service compared to our competitors, he has now asked us to build a Bill tally service on top of the existing calculator service which will verify if the total amount calculated by some system tallies with the total amount we calculate since we are the best and most accurate in the calculator business, also again it has to be service offering(a.k.a Restful Service).
 
